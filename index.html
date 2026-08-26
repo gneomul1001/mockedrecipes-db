@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>모크드 레시피 포털 - 홈</title>
+  <title>모크드 레시피 포털 - 레시피 관리</title>
   <style>
     :root {
       --primary-color: #ff5722;
@@ -99,9 +99,6 @@
       max-width: 1400px;
       margin: 0 auto;
       padding: 1.5rem 1.25rem;
-      display: flex;
-      flex-direction: column;
-      gap: 1.5rem;
     }
 
     .btn {
@@ -116,7 +113,6 @@
       align-items: center;
       justify-content: center;
       gap: 0.35rem;
-      text-decoration: none;
       white-space: nowrap;
     }
 
@@ -129,16 +125,6 @@
       background: var(--primary-hover);
     }
 
-    .btn-secondary {
-      background: #eff6ff;
-      border: 1px solid #bfdbfe;
-      color: #1d4ed8;
-    }
-
-    .btn-secondary:hover {
-      background: #dbeafe;
-    }
-
     .btn-outline {
       background: #fff;
       border: 1px solid var(--border-color);
@@ -149,116 +135,313 @@
       background: #f8fafc;
     }
 
-    .hero-banner {
-      background: linear-gradient(135deg, #fff7ed 0%, #ffedd5 100%);
-      border: 1px solid #fed7aa;
-      border-radius: var(--radius);
-      padding: 2rem;
+    .recipe-layout {
       display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 1.5rem;
+      gap: 1.25rem;
+      align-items: flex-start;
     }
 
-    .hero-text h1 {
-      font-size: 1.65rem;
-      color: #9a3412;
-      margin-bottom: 0.4rem;
-    }
-
-    .hero-text p {
-      font-size: 0.95rem;
-      color: #c2410c;
-    }
-
-    .stats-row {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 1rem;
-    }
-
-    .stat-card {
+    .sidebar {
+      width: 280px;
       background: var(--card-bg);
       border: 1px solid var(--border-color);
       border-radius: var(--radius);
-      padding: 1.25rem;
+      padding: 1rem;
+      height: calc(100vh - 140px);
+      position: sticky;
+      top: 80px;
       display: flex;
-      align-items: center;
-      gap: 1rem;
+      flex-direction: column;
+      flex-shrink: 0;
     }
 
-    .stat-icon {
-      width: 48px;
-      height: 48px;
-      border-radius: var(--radius-sm);
+    .sidebar-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      margin-bottom: 0.6rem;
       display: flex;
+      justify-content: space-between;
       align-items: center;
-      justify-content: center;
-      font-size: 1.5rem;
     }
 
-    .stat-info h4 {
+    .category-filter {
+      margin-bottom: 0.6rem;
+    }
+
+    .category-filter input,
+    .search-input {
+      width: 100%;
+      padding: 0.5rem 0.75rem;
       font-size: 0.85rem;
-      color: var(--text-muted);
-      font-weight: 500;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      outline: none;
     }
 
-    .stat-info .stat-value {
-      font-size: 1.5rem;
-      font-weight: 800;
+    .category-list {
+      list-style: none;
+      overflow-y: auto;
+      flex: 1;
+      padding-right: 0.2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .category-btn {
+      width: 100%;
+      text-align: left;
+      background: none;
+      border: none;
+      padding: 0.5rem 0.65rem;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-size: 0.85rem;
+      color: var(--text-main);
+      transition: all 0.15s;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .category-btn:hover {
+      background-color: #f1f5f9;
+      color: var(--primary-color);
+    }
+
+    .category-btn.active {
+      background-color: var(--primary-color);
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .category-btn .badge {
+      font-size: 0.75rem;
+      padding: 2px 6px;
+      background: rgba(0, 0, 0, 0.06);
+      border-radius: 10px;
+    }
+
+    .category-btn.active .badge {
+      background: rgba(255, 255, 255, 0.25);
+    }
+
+    .more-categories-btn {
+      width: 100%;
+      margin-top: 0.5rem;
+      background: #f1f5f9;
+      border: 1px dashed var(--border-color);
+      color: var(--text-muted);
+      padding: 0.5rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-align: center;
+      transition: all 0.2s;
+    }
+
+    .more-categories-btn:hover {
+      background: #e2e8f0;
       color: var(--text-main);
     }
 
-    .home-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-      gap: 1.5rem;
-    }
-
-    .home-section-card {
-      background: var(--card-bg);
-      border: 1px solid var(--border-color);
-      border-radius: var(--radius);
-      padding: 1.25rem;
+    .recipe-main {
+      flex: 1;
       display: flex;
       flex-direction: column;
       gap: 1rem;
+      min-width: 0;
     }
 
-    .home-section-header {
+    .recipe-toolbar {
+      background: var(--card-bg);
+      padding: 0.85rem 1.1rem;
+      border-radius: var(--radius);
+      border: 1px solid var(--border-color);
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
     }
 
-    .home-section-header h3 {
-      font-size: 1.1rem;
-      font-weight: 700;
+    .recipe-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1rem;
     }
 
-    .recent-list {
-      list-style: none;
+    .recipe-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
       display: flex;
       flex-direction: column;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .recipe-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.04);
+    }
+
+    .card-body {
+      padding: 1.1rem;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
       gap: 0.6rem;
     }
 
-    .recent-item {
-      padding: 0.75rem;
-      border: 1px solid var(--border-color);
+    .card-category {
+      font-size: 0.75rem;
+      color: var(--primary-color);
+      font-weight: 700;
+    }
+
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      line-height: 1.35;
+    }
+
+    .recipe-section-box {
+      font-size: 0.85rem;
+      color: #334155;
+      line-height: 1.5;
+      background: #f8fafc;
+      padding: 0.65rem 0.75rem;
       border-radius: var(--radius-sm);
+      border-left: 3px solid var(--primary-color);
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    .recipe-section-box + .recipe-section-box {
+      margin-top: 4px;
+    }
+
+    .card-actions {
+      display: flex;
+      gap: 0.5rem;
+      padding: 0.65rem 1.1rem;
+      background: #ffffff;
+      border-top: 1px solid var(--border-color);
+      justify-content: flex-end;
+      border-bottom-left-radius: var(--radius);
+      border-bottom-right-radius: var(--radius);
+    }
+
+    .card-actions button {
+      padding: 0.35rem 0.7rem;
+      font-size: 0.8rem;
+      border-radius: 4px;
+      cursor: pointer;
+      border: 1px solid var(--border-color);
+      background: #fff;
+    }
+
+    .card-actions .edit-btn:hover {
+      background: #eff6ff;
+      color: var(--secondary-color);
+      border-color: #bfdbfe;
+    }
+
+    .card-actions .delete-btn:hover {
+      background: #fef2f2;
+      color: var(--danger-color);
+      border-color: #fecaca;
+    }
+
+    /* Modal 개선: 화면 잘림 방지 및 스크롤 영역 분리 */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.45);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 1rem;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      width: 100%;
+      max-width: 580px;
+      max-height: 85vh; /* 화면 높이에 맞춰 안정적으로 조절 */
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+      overflow: hidden;
+    }
+
+    .modal-header {
+      padding: 1rem 1.25rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      text-decoration: none;
-      color: inherit;
-      transition: all 0.15s;
+      border-bottom: 1px solid var(--border-color);
+      flex-shrink: 0;
     }
 
-    .recent-item:hover {
-      background: #f8fafc;
-      border-color: #cbd5e1;
+    /* 폼 전체가 flex 컨테이너가 되도록 설정하여 내부 스크롤 활성화 */
+    #recipeForm {
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      flex: 1;
+    }
+
+    .modal-body {
+      padding: 1.25rem;
+      overflow-y: auto; /* 내용이 넘칠 경우 이 영역만 스크롤되도록 설정 */
+      flex: 1;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 0.35rem;
+    }
+
+    .form-group input,
+    .form-group select,
+    .form-group textarea {
+      width: 100%;
+      padding: 0.6rem;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      font-size: 0.9rem;
+      outline: none;
+      font-family: inherit;
+    }
+
+    .form-group textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .modal-footer {
+      padding: 0.9rem 1.25rem;
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.5rem;
+      border-top: 1px solid var(--border-color);
+      background: #fafafa;
+      flex-shrink: 0;
     }
 
     @media (max-width: 900px) {
@@ -270,8 +453,13 @@
         width: 100%;
         justify-content: center;
       }
-      .home-grid {
-        grid-template-columns: 1fr;
+      .recipe-layout {
+        flex-direction: column;
+      }
+      .sidebar {
+        width: 100%;
+        height: auto;
+        position: static;
       }
     }
   </style>
@@ -282,67 +470,92 @@
     <div class="header-container">
       <a href="index.html" class="logo">🍲 모크드 레시피 포털</a>
       <nav class="nav-tabs">
-        <a href="index.html" class="tab-btn active">🏠 홈</a>
-        <a href="recipes.html" class="tab-btn">📖 레시피</a>
+        <a href="index.html" class="tab-btn">🏠 홈</a>
+        <a href="recipes.html" class="tab-btn active">📖 레시피</a>
         <a href="database.html" class="tab-btn">🗄️ 음식 DB</a>
       </nav>
     </div>
   </header>
 
   <main class="container">
-    <section class="hero-banner">
-      <div class="hero-text">
-        <h1>나만의 미식 데이터베이스 & 레시피</h1>
-        <p>체계적인 음식 사전 관리와 단계별 조리 비법을 한곳에서 기록하고 조회하세요.</p>
-      </div>
-      <div style="display: flex; gap: 0.5rem;">
-        <a href="recipes.html?action=new" class="btn btn-primary">+ 새 레시피 작성</a>
-        <a href="database.html" class="btn btn-secondary">음식 사전 보기</a>
-      </div>
-    </section>
+    <div class="recipe-layout">
+      <aside class="sidebar">
+        <div class="sidebar-title">
+          <span>레시피 카테고리</span>
+          <span id="recipeCatCount" style="font-size: 0.8rem; color: var(--text-muted);"></span>
+        </div>
+        <div class="category-filter">
+          <input type="text" id="recipeCatSearch" placeholder="분류 검색...">
+        </div>
+        <ul class="category-list" id="recipeCategoryList"></ul>
+        <div id="moreCategoriesContainer"></div>
+      </aside>
 
-    <section class="stats-row">
-      <div class="stat-card">
-        <div class="stat-icon" style="background: #fff1f2; color: #e11d48;">📂</div>
-        <div class="stat-info">
-          <h4>전체 분류 카테고리</h4>
-          <div class="stat-value" id="statCategories">0</div>
+      <div class="recipe-main">
+        <div class="recipe-toolbar">
+          <div>
+            <h2 id="currentCategoryTitle" style="font-size: 1.15rem; display: inline-block; margin-right: 0.5rem;">전체 요리</h2>
+            <span id="recipeListCount" style="color: var(--text-muted); font-size: 0.85rem;"></span>
+          </div>
+          <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+            <input type="text" id="recipeSearchInput" class="search-input" style="width: 200px;" placeholder="레시피/재료 검색...">
+            <button class="btn btn-primary" onclick="openRecipeModal()">+ 레시피 작성</button>
+          </div>
         </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon" style="background: #ecfdf5; color: #059669;">🥘</div>
-        <div class="stat-info">
-          <h4>등록된 음식 DB</h4>
-          <div class="stat-value" id="statDbFoods">0</div>
-        </div>
-      </div>
-      <div class="stat-card">
-        <div class="stat-icon" style="background: #eff6ff; color: #2563eb;">📜</div>
-        <div class="stat-info">
-          <h4>작성된 레시피</h4>
-          <div class="stat-value" id="statRecipes">0</div>
-        </div>
-      </div>
-    </section>
 
-    <section class="home-grid">
-      <div class="home-section-card">
-        <div class="home-section-header">
-          <h3>최근 등록된 레시피</h3>
-          <a href="recipes.html" class="btn btn-outline" style="font-size: 0.78rem; padding: 0.3rem 0.6rem;">전체 보기 →</a>
-        </div>
-        <ul class="recent-list" id="homeRecentRecipes"></ul>
+        <div class="recipe-grid" id="recipeGrid"></div>
       </div>
-
-      <div class="home-section-card">
-        <div class="home-section-header">
-          <h3>음식 DB 추천 탐색</h3>
-          <a href="database.html" class="btn btn-outline" style="font-size: 0.78rem; padding: 0.3rem 0.6rem;">DB 관리 →</a>
-        </div>
-        <div style="display: flex; flex-wrap: wrap; gap: 0.5rem;" id="homeFoodChips"></div>
-      </div>
-    </section>
+    </div>
   </main>
+
+  <div class="modal-overlay" id="recipeModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 id="modalTitle">신규 레시피 등록</h3>
+        <button onclick="closeRecipeModal()" style="background: none; border: none; font-size: 1.3rem; cursor: pointer;">×</button>
+      </div>
+      <form id="recipeForm" onsubmit="saveRecipe(event)">
+        <div class="modal-body">
+          <input type="hidden" id="recipeId">
+
+          <div class="form-group">
+            <label for="recipeCategorySelect">카테고리</label>
+            <select id="recipeCategorySelect" onchange="updateDbAutocomplete()" required></select>
+          </div>
+
+          <div class="form-group">
+            <label for="recipeName">레시피 이름</label>
+            <input type="text" id="recipeName" required placeholder="레시피 이름을 입력하세요">
+            <div id="recipeQuickPicks" style="display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px;"></div>
+          </div>
+
+          <div class="form-group">
+            <label for="recipeIngredients">재료</label>
+            <textarea id="recipeIngredients" placeholder="필요한 재료를 입력하세요 (예: 닭고기 500g, 대파 1대)"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="recipePreparation">준비</label>
+            <textarea id="recipePreparation" placeholder="재료 손질 및 사전 준비 과정을 입력하세요"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="recipeProcess">과정</label>
+            <textarea id="recipeProcess" required placeholder="본격적인 조리 순서를 입력하세요"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label for="recipeTip">팁</label>
+            <textarea id="recipeTip" placeholder="맛을 살리는 요리 팁이나 주의사항을 입력하세요"></textarea>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-outline" onclick="closeRecipeModal()">취소</button>
+          <button type="submit" class="btn btn-primary">저장하기</button>
+        </div>
+      </form>
+    </div>
+  </div>
 
   <script>
     const defaultCategories = ["밥류", "죽류", "반찬", "미음", "범벅", "응이", "국수", "수제비류", "만두류", "떡국류", "국", "탕", "찌개", "전골", "김치", "나물", "구이류", "조림류", "볶음", "초류", "전류", "찜류", "선류", "회류", "마른찬류", "순대", "편육", "족편", "수란류", "묵류", "두부류", "장아찌류", "젓갈류", "식해류", "쌈류", "떡류", "과정류", "푸드트럭요리", "시장음식", "길거리음식", "도시락", "채식·비건", "퓨전요리", "브런치", "버거", "샌드위치", "샐러드", "포케", "타코", "부리토", "피자", "파스타", "치킨", "덮밥", "라이스볼", "누들", "커리", "케밥", "핫도그", "프라이드치킨", "젓갈", "김치", "정찬", "사찰음식", "궁중음식", "전통찻집", "술", "해장음식", "면요리", "메밀요리", "분식", "전통간식", "전통떡", "빵", "롤빵", "디저트", "브라우니", "대형 케이크", "소형 케이크", "사탕", "과자", "쿠키", "비스킷", "크래커", "프로스팅", "필링", "파이", "타르트", "페이스트리", "크럼블", "코블러", "아이스크림", "냉동 디저트", "무스", "트라이플", "커스터드", "팬케이크", "와플", "크레페", "칠리", "딥", "스프레드", "살사", "계란 요리", "튀김", "그릴", "바비큐", "구운 파스타", "반죽", "소스", "속을 채운 파스타", "피자", "칼조네", "패스트푸드", "야매요리", "수프", "스튜", "원팟요리", "볶음 요리", "퀘사디아", "토스트", "크로스티니", "랩", "무알음료", "알콜음료", "칵테일", "처트니", "피클", "렐리시", "발효음식", "잼", "젤리", "보존음식", "드레싱", "마리네이드", "스시", "디저트용 소스", "생선용 소스", "육류용 소스", "가금류용 소스", "육수", "스터핑", "생선요리", "해산물요리", "과일요리", "곡물요리", "콩요리", "파스타요리", "허브요리", "향신료요리", "육류요리", "가금류요리", "수렵육요리", "채소요리", "비건요리", "애프터눈 티요리", "전채요리", "아침식사요리", "브런치요리", "카나페요리", "오르되브르요리", "디저트요리", "일반 코스요리", "점심요리", "주요리", "메인 코스요리", "곁들임 요리", "타파스요리", "메제요리", "스낵요리", "저녁식사", "명절/홀리데이", "한국식 중식", "산둥요리", "쓰촨요리", "광둥요리", "장쑤요리", "저장요리", "푸젠요리", "후난요리", "안후이요리", "베이징요리", "상하이요리", "톈진요리", "충칭요리", "허베이요리", "산시(산서)요리", "네이멍구요리", "랴오닝요리", "지린요리", "헤이룽장요리", "허난요리", "후베이요리", "장시요리", "구이저우요리", "광시요리", "하이난요리", "윈난요리", "산시(섬서)요리", "간쑤요리", "칭하이요리", "닝샤요리", "신장요리", "티베트요리", "홍콩요리", "마카오요리", "중국술", "중식포차요리", "중식코스요리", "중식밥집", "중식도시락", "중식분식", "중식야시장", "중식 퓨전요리", "함경도", "평안도", "황해도", "서울", "경기도", "강원도", "충청도", "전라도", "경상도", "일본", "몽골", "대만", "홍콩", "마카오", "대한민국", "북한", "베트남", "태국", "캄보디아", "라오스", "미얀마", "말레이시아", "싱가포르", "인도네시아", "브루나이", "필리핀", "동티모르", "인도", "파키스탄", "방글라데시", "네팔", "부탄", "스리랑카", "몰디브", "아프가니스탄", "사우디아라비아", "아랍에미리트", "카타르", "쿠웨이트", "바레인", "오만", "예멘", "이라크", "이란", "시리아", "레바논", "요르단", "이스라엘", "팔레스타인", "터키", "키프로스", "아르메니아", "아제르바이잔", "조지아", "카자흐스탄", "우즈베키스탄", "투르크메니스탄", "키르기스스탄", "타지키스탄", "러시아", "우크라이나", "벨라루스", "몰도바", "루마니아", "불가리아", "세르비아", "몬테네그로", "북마케도니아", "보스니아 헤르체고비나", "코소보", "영국", "아일랜드", "프랑스", "벨기에", "네덜란드", "룩셈부르크", "독일", "오스트리아", "스위스", "리히텐슈타인", "모나코", "스페인", "포르투갈", "이탈리아", "그리스", "알바니아", "크로아티아", "슬로베니아", "몰타", "안도라", "산마리노", "바티칸", "노르웨이", "스웨덴", "덴마크", "핀란드", "아이슬란드", "폴란드", "체코", "슬로바키아", "헝가리", "에스토니아", "라트비아", "리투아니아", "가나", "가봉", "감비아", "기니", "기니비사우", "나미비아", "나이지리아", "남수단", "남아프리카공화국", "니제르", "라이베리아", "레소토", "르완다", "리비아", "마다가스카르", "말라위", "말리", "모로코", "모리셔스", "모리타니", "모잠비크", "베냉", "보츠와나", "부룬디", "부르키나파소", "상투메 프린시페", "서사하라", "세네갈", "세이셸", "소말리아", "수단", "시에라리온", "알제리", "앙골라", "에리트레아", "에스와티니", "에티오피아", "우간다", "이집트", "잠비아", "적도 기니", "중앙아프리카공화국", "지부티", "짐바브웨", "차드", "카메룬", "카보베르데", "케냐", "코모로", "코트디부아르", "콩고 공화국", "콩고 민주 공화국", "탄자니아", "토고", "튀니지", "캐나다", "미국", "멕시코", "그린란드", "버뮤다", "생피에르 미클롱", "과테말라", "벨리즈", "엘살바도르", "온두라스", "니카라과", "코스타리카", "파나마", "쿠바", "자메이카", "아이티", "도미니카공화국", "바하마", "바베이도스", "트리니다드 토바고", "그레나다", "세인트루시아", "세인트빈센트 그레나딘", "도미니카", "앤티가 바부다", "세인트키츠 네비스", "아루바", "퀴라소", "케이맨 제도", "버진아일랜드", "푸에르토리코", "과들루프", "마르티니크", "브라질", "아르헨티나", "칠레", "페루", "볼리비아", "파라과이", "우루과이", "콜롬비아", "베네수엘라", "에콰도르", "가이아나", "수리남", "프랑스령 기아나", "포클랜드 제도", "호주", "뉴질랜드", "파푸아뉴기니", "피지", "사모아", "통가", "바누아투", "솔로몬 제도", "미크로네시아 연방", "마셜 제도", "팔라우", "키리바시", "나우루", "투발루", "쿡 제도", "니우에", "뉴칼레도니아", "프랑스령 폴리네시아", "괌", "북마리아나 제도", "미국령 사모아", "크리스마스섬", "코코스 제도", "노퍽섬", "아프리카 부족요리", "아시아 부족요리", "유럽 부족요리", "북미 부족요리", "중남미 부족요리", "카리브해 부족요리", "남미 부족요리", "오세아니아 부족요리"];
@@ -351,65 +564,268 @@
     const DB_STORAGE_KEY = "mocked_food_database";
     const categories = Array.from(new Set(defaultCategories));
 
+    let recipes = [];
+    let foodDatabase = {};
+    let selectedRecipeCategory = "전체";
+    let categoryDisplayLimit = 10;
+
     function loadData() {
       const storedRecipes = localStorage.getItem(STORAGE_KEY);
-      const recipes = storedRecipes ? JSON.parse(storedRecipes) : [];
-      if (!storedRecipes) localStorage.setItem(STORAGE_KEY, JSON.stringify([]));
+      recipes = storedRecipes ? JSON.parse(storedRecipes) : [];
 
       const storedDb = localStorage.getItem(DB_STORAGE_KEY);
-      const foodDatabase = storedDb ? JSON.parse(storedDb) : {};
-      if (!storedDb) localStorage.setItem(DB_STORAGE_KEY, JSON.stringify({}));
-
-      return { recipes, foodDatabase };
+      foodDatabase = storedDb ? JSON.parse(storedDb) : {};
     }
 
-    function renderDashboard() {
-      const { recipes, foodDatabase } = loadData();
+    function saveRecipes() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(recipes));
+    }
 
-      document.getElementById("statCategories").textContent = categories.length.toLocaleString();
+    function saveFoodDb() {
+      localStorage.setItem(DB_STORAGE_KEY, JSON.stringify(foodDatabase));
+    }
 
-      let totalFoods = 0;
-      Object.values(foodDatabase).forEach(arr => {
-        totalFoods += Array.isArray(arr) ? arr.length : 0;
+    function renderRecipeCategories(filterText = "") {
+      const listEl = document.getElementById("recipeCategoryList");
+      const moreContainer = document.getElementById("moreCategoriesContainer");
+      listEl.innerHTML = "";
+      moreContainer.innerHTML = "";
+
+      const allLi = document.createElement("li");
+      allLi.innerHTML = `
+        <button class="category-btn ${selectedRecipeCategory === '전체' ? 'active' : ''}" onclick="selectRecipeCat('전체')">
+          <span>전체 보기</span>
+          <span class="badge">${recipes.length}</span>
+        </button>
+      `;
+      listEl.appendChild(allLi);
+
+      const filtered = categories.filter(c => c.toLowerCase().includes(filterText.toLowerCase()));
+      document.getElementById("recipeCatCount").textContent = `(${categories.length})`;
+
+      const displayList = filterText ? filtered : filtered.slice(0, categoryDisplayLimit);
+
+      displayList.forEach(cat => {
+        const count = recipes.filter(r => r.category === cat).length;
+        const li = document.createElement("li");
+        li.innerHTML = `
+          <button class="category-btn ${selectedRecipeCategory === cat ? 'active' : ''}" onclick="selectRecipeCat('${cat}')">
+            <span>${cat}</span>
+            <span class="badge">${count}</span>
+          </button>
+        `;
+        listEl.appendChild(li);
       });
-      document.getElementById("statDbFoods").textContent = totalFoods.toLocaleString();
-      document.getElementById("statRecipes").textContent = recipes.length.toLocaleString();
 
-      const recentList = document.getElementById("homeRecentRecipes");
-      if (recipes.length === 0) {
-        recentList.innerHTML = `<li style="color:var(--text-muted); font-size:0.85rem;">작성된 레시피가 없습니다.</li>`;
-      } else {
-        recentList.innerHTML = recipes.slice(0, 5).map(r => `
-          <a class="recent-item" href="recipes.html?cat=${encodeURIComponent(r.category)}">
-            <div>
-              <div style="font-weight:600; font-size:0.9rem;">${r.title}</div>
-              <span style="font-size:0.75rem; color:var(--primary-color); font-weight:600;">${r.category}</span>
-            </div>
-            <span style="font-size:0.8rem; color:var(--text-muted);">→</span>
-          </a>
-        `).join("");
+      if (!filterText && categoryDisplayLimit < filtered.length) {
+        const remainingCount = filtered.length - categoryDisplayLimit;
+        moreContainer.innerHTML = `
+          <button class="more-categories-btn" onclick="loadMoreCategories()">
+            더보기 (${remainingCount}개 더)
+          </button>
+        `;
+      }
+    }
+
+    function loadMoreCategories() {
+      categoryDisplayLimit += 10;
+      renderRecipeCategories(document.getElementById("recipeCatSearch").value.trim());
+    }
+
+    function selectRecipeCat(cat) {
+      selectedRecipeCategory = cat;
+      renderRecipeCategories(document.getElementById("recipeCatSearch").value.trim());
+      renderRecipes();
+    }
+
+    function renderRecipes() {
+      const gridEl = document.getElementById("recipeGrid");
+      gridEl.innerHTML = "";
+      const searchKeyword = document.getElementById("recipeSearchInput").value.trim().toLowerCase();
+
+      document.getElementById("currentCategoryTitle").textContent = selectedRecipeCategory === "전체" ? "전체 요리" : selectedRecipeCategory;
+
+      let filtered = recipes.filter(item => {
+        const matchCategory = (selectedRecipeCategory === "전체") || (item.category === selectedRecipeCategory);
+        const matchSearch = !searchKeyword ||
+          item.title.toLowerCase().includes(searchKeyword) ||
+          item.category.toLowerCase().includes(searchKeyword) ||
+          (item.ingredients && item.ingredients.toLowerCase().includes(searchKeyword)) ||
+          (item.preparation && item.preparation.toLowerCase().includes(searchKeyword)) ||
+          (item.process && item.process.toLowerCase().includes(searchKeyword)) ||
+          (item.tip && item.tip.toLowerCase().includes(searchKeyword));
+        return matchCategory && matchSearch;
+      });
+
+      document.getElementById("recipeListCount").textContent = `${filtered.length}개의 레시피`;
+
+      if (filtered.length === 0) {
+        gridEl.innerHTML = `
+          <div style="grid-column: 1/-1; text-align: center; padding: 3rem 1rem; color: var(--text-muted); background: #fff; border-radius: var(--radius); border: 1px dashed var(--border-color);">
+            <p style="font-size: 1rem; margin-bottom: 0.5rem; font-weight: 600;">등록된 레시피가 없습니다.</p>
+            <button class="btn btn-primary" onclick="openRecipeModal()">+ 레시피 등록하기</button>
+          </div>
+        `;
+        return;
       }
 
-      const foodChips = document.getElementById("homeFoodChips");
-      const sampleFoods = [];
-      for (const [cat, foods] of Object.entries(foodDatabase)) {
-        if (Array.isArray(foods)) {
-          foods.forEach(f => sampleFoods.push({ cat, food: f }));
+      filtered.forEach(item => {
+        const card = document.createElement("div");
+        card.className = "recipe-card";
+        
+        const ingredientsText = item.ingredients ? `<div class="recipe-section-box"><strong>[재료]</strong><br>${item.ingredients}</div>` : '';
+        const preparationText = item.preparation ? `<div class="recipe-section-box"><strong>[준비]</strong><br>${item.preparation}</div>` : '';
+        const processText = item.process || item.desc ? `<div class="recipe-section-box"><strong>[과정]</strong><br>${item.process || item.desc}</div>` : '';
+        const tipText = item.tip ? `<div class="recipe-section-box"><strong>[팁]</strong><br>${item.tip}</div>` : '';
+
+        card.innerHTML = `
+          <div class="card-body">
+            <span class="card-category">${item.category}</span>
+            <div class="card-title">${item.title}</div>
+            ${ingredientsText}
+            ${preparationText}
+            ${processText}
+            ${tipText}
+          </div>
+          <div class="card-actions">
+            <button class="edit-btn" onclick="openRecipeModal('${item.id}')">수정</button>
+            <button class="delete-btn" onclick="deleteRecipe('${item.id}')">삭제</button>
+          </div>
+        `;
+        gridEl.appendChild(card);
+      });
+    }
+
+    function openRecipeModal(recipeId = null) {
+      const modal = document.getElementById("recipeModal");
+      const modalTitle = document.getElementById("modalTitle");
+      const form = document.getElementById("recipeForm");
+
+      form.reset();
+
+      const catSelect = document.getElementById("recipeCategorySelect");
+      catSelect.innerHTML = categories.map(cat => `<option value="${cat}">${cat}</option>`).join("");
+
+      if (recipeId) {
+        const target = recipes.find(r => r.id === recipeId);
+        if (!target) return;
+        modalTitle.textContent = "레시피 수정";
+        document.getElementById("recipeId").value = target.id;
+        catSelect.value = target.category;
+        document.getElementById("recipeName").value = target.title;
+        document.getElementById("recipeIngredients").value = target.ingredients || "";
+        document.getElementById("recipePreparation").value = target.preparation || "";
+        document.getElementById("recipeProcess").value = target.process || target.desc || "";
+        document.getElementById("recipeTip").value = target.tip || "";
+      } else {
+        modalTitle.textContent = "신규 레시피 등록";
+        document.getElementById("recipeId").value = "";
+        if (selectedRecipeCategory !== "전체") {
+          catSelect.value = selectedRecipeCategory;
         }
       }
 
-      if (sampleFoods.length === 0) {
-        foodChips.innerHTML = `<span style="font-size:0.85rem; color:var(--text-muted);">DB 데이터가 없습니다.</span>`;
-      } else {
-        foodChips.innerHTML = sampleFoods.slice(0, 14).map(item => `
-          <a href="database.html?cat=${encodeURIComponent(item.cat)}" style="background:#f1f5f9; border:1px solid #cbd5e1; border-radius:20px; padding:4px 10px; font-size:0.8rem; text-decoration:none; color:inherit;">
-            ${item.food} <small style="color:var(--text-muted);">(${item.cat})</small>
-          </a>
+      updateDbAutocomplete();
+      modal.classList.add("active");
+    }
+
+    function closeRecipeModal() {
+      document.getElementById("recipeModal").classList.remove("active");
+    }
+
+    function updateDbAutocomplete() {
+      const cat = document.getElementById("recipeCategorySelect").value;
+      const pickContainer = document.getElementById("recipeQuickPicks");
+      const list = foodDatabase[cat] || [];
+
+      if (list.length === 0) {
+        pickContainer.innerHTML = `<span style="font-size: 0.75rem; color: #94a3b8;">등록된 DB 음식이 없습니다.</span>`;
+        return;
+      }
+
+      pickContainer.innerHTML = `<span style="font-size: 0.75rem; color: #64748b; margin-right: 4px;">💡 DB 자동 선택:</span>` +
+        list.slice(0, 10).map(name => `
+          <button type="button" onclick="document.getElementById('recipeName').value='${name.replace(/'/g, "\\'")}'" style="background: #eff6ff; border: 1px solid #bfdbfe; border-radius: 12px; padding: 2px 8px; font-size: 0.75rem; color: #1d4ed8; cursor: pointer;">+ ${name}</button>
         `).join("");
+    }
+
+    function saveRecipe(event) {
+      event.preventDefault();
+      const id = document.getElementById("recipeId").value;
+      const category = document.getElementById("recipeCategorySelect").value;
+      const title = document.getElementById("recipeName").value.trim();
+      const ingredients = document.getElementById("recipeIngredients").value.trim();
+      const preparation = document.getElementById("recipePreparation").value.trim();
+      const process = document.getElementById("recipeProcess").value.trim();
+      const tip = document.getElementById("recipeTip").value.trim();
+
+      if (id) {
+        const idx = recipes.findIndex(r => r.id === id);
+        if (idx !== -1) {
+          recipes[idx] = { ...recipes[idx], category, title, ingredients, preparation, process, tip };
+        }
+      } else {
+        recipes.unshift({
+          id: "recipe-" + Date.now(),
+          category,
+          title,
+          ingredients,
+          preparation,
+          process,
+          tip
+        });
+      }
+
+      if (!foodDatabase[category]) foodDatabase[category] = [];
+      if (title && !foodDatabase[category].includes(title)) {
+        foodDatabase[category].push(title);
+        saveFoodDb();
+      }
+
+      saveRecipes();
+      closeRecipeModal();
+      renderRecipeCategories(document.getElementById("recipeCatSearch").value.trim());
+      renderRecipes();
+    }
+
+    function deleteRecipe(id) {
+      if (confirm("이 레시피를 삭제하시겠습니까?")) {
+        recipes = recipes.filter(r => r.id !== id);
+        saveRecipes();
+        renderRecipeCategories(document.getElementById("recipeCatSearch").value.trim());
+        renderRecipes();
       }
     }
 
-    renderDashboard();
+    function handleQueryParams() {
+      const params = new URLSearchParams(window.location.search);
+      const catParam = params.get("cat");
+      const actionParam = params.get("action");
+
+      if (catParam && (categories.includes(catParam) || catParam === "전체")) {
+        selectedRecipeCategory = catParam;
+      }
+      if (actionParam === "new") {
+        openRecipeModal();
+      }
+    }
+
+    document.getElementById("recipeCatSearch").addEventListener("input", (e) => {
+      renderRecipeCategories(e.target.value.trim());
+    });
+
+    document.getElementById("recipeSearchInput").addEventListener("input", () => {
+      renderRecipes();
+    });
+
+    document.getElementById("recipeModal").addEventListener("click", (e) => {
+      if (e.target.id === "recipeModal") closeRecipeModal();
+    });
+
+    loadData();
+    handleQueryParams();
+    renderRecipeCategories();
+    renderRecipes();
   </script>
 </body>
 </html>
