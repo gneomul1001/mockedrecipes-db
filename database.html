@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>모크드 레시피 포털 - 음식 DB</title>
+  <style>
+    :root {
+      --primary-color: #ff5722;
+      --primary-hover: #e64a19;
+      --secondary-color: #3b82f6;
+      --secondary-hover: #2563eb;
+      --accent-color: #10b981;
+      --danger-color: #ef4444;
+      --bg-color: #f8fafc;
+      --card-bg: #ffffff;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --border-color: #e2e8f0;
+      --radius: 12px;
+      --radius-sm: 8px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    header {
+      background: var(--card-bg);
+      border-bottom: 1px solid var(--border-color);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 0.75rem 1.25rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .logo {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: var(--primary-color);
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 0.5rem;
+      background: #f1f5f9;
+      padding: 4px;
+      border-radius: var(--radius);
+    }
+
+    .tab-btn {
+      padding: 0.5rem 1.1rem;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      border-radius: var(--radius-sm);
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .tab-btn:hover { color: var(--text-main); }
+    .tab-btn.active {
+      background: #fff;
+      color: var(--primary-color);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    }
+
+    .container {
+      flex: 1;
+      width: 100%;
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 1.5rem 1.25rem;
+    }
+
+    .btn {
+      padding: 0.55rem 0.95rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.35rem;
+      white-space: nowrap;
+    }
+
+    .btn-primary { background: var(--primary-color); color: #fff; }
+    .btn-primary:hover { background: var(--primary-hover); }
+
+    .db-layout {
+      display: grid;
+      grid-template-columns: 320px 1fr;
+      gap: 1.25rem;
+      min-height: calc(100vh - 140px);
+    }
+
+    .db-category-panel, .db-content-panel {
+      background: var(--card-bg);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius);
+      display: flex;
+      flex-direction: column;
+      padding: 1.25rem;
+    }
+
+    .db-header {
+      padding-bottom: 0.85rem;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .db-header h3 { font-size: 1.1rem; font-weight: 700; }
+
+    .category-filter { margin-bottom: 0.6rem; }
+    .category-filter input, .search-input {
+      width: 100%;
+      padding: 0.5rem 0.75rem;
+      font-size: 0.85rem;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      outline: none;
+    }
+
+    .category-list {
+      list-style: none;
+      overflow-y: auto;
+      flex: 1;
+      padding-right: 0.2rem;
+    }
+
+    .category-btn {
+      width: 100%;
+      text-align: left;
+      background: none;
+      border: none;
+      padding: 0.5rem 0.65rem;
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      font-size: 0.85rem;
+      color: var(--text-main);
+      transition: all 0.15s;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .category-btn:hover { background-color: #f1f5f9; color: var(--primary-color); }
+    .category-btn.active { background-color: var(--primary-color); color: #fff; font-weight: 600; }
+    .category-btn .badge { font-size: 0.75rem; padding: 2px 6px; background: rgba(0, 0, 0, 0.06); border-radius: 10px; }
+    .category-btn.active .badge { background: rgba(255, 255, 255, 0.25); }
+
+    .db-table-wrapper {
+      flex: 1;
+      overflow-y: auto;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      background: #fff;
+    }
+
+    .db-grid-container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      column-gap: 1.5rem;
+      row-gap: 0;
+      padding: 0.5rem 1rem;
+    }
+
+    .db-row-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.45rem 0.6rem;
+      border-bottom: 1px dashed var(--border-color);
+      font-size: 0.88rem;
+      transition: background-color 0.15s;
+    }
+
+    .db-row-item:hover { background-color: #f8fafc; }
+    .db-row-left { display: flex; align-items: center; gap: 0.6rem; overflow: hidden; }
+    .db-index-badge { font-size: 0.72rem; font-weight: 700; color: #94a3b8; width: 28px; text-align: right; flex-shrink: 0; }
+    .db-food-name { font-weight: 500; color: var(--text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+    .db-row-item .del-btn {
+      color: #94a3b8;
+      cursor: pointer;
+      border: none;
+      background: none;
+      font-size: 1.1rem;
+      line-height: 1;
+      padding: 2px 6px;
+      border-radius: 4px;
+      transition: all 0.15s;
+    }
+
+    .db-row-item .del-btn:hover { color: var(--danger-color); background: #fee2e2; }
+
+    .pagination-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 0.85rem;
+      margin-top: 0.5rem;
+      border-top: 1px solid var(--border-color);
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .pagination-nav { display: flex; gap: 0.3rem; align-items: center; }
+    .page-num-btn {
+      min-width: 28px;
+      height: 28px;
+      padding: 0 6px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      border: 1px solid var(--border-color);
+      background: #fff;
+      border-radius: 4px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .page-num-btn:hover { background: #f1f5f9; }
+    .page-num-btn.active { background: var(--primary-color); color: #fff; border-color: var(--primary-color); }
+    .page-num-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+    /* 음식 추가 영역 상단 이동에 따른 스타일 */
+    .db-add-bar {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 0.85rem;
+      padding-bottom: 0.85rem;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    /* 카테고리 더보기 버튼 스타일 */
+    .load-more-cat-btn {
+      width: 100%;
+      margin-top: 0.75rem;
+      padding: 0.5rem;
+      background: #f1f5f9;
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-sm);
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .load-more-cat-btn:hover {
+      background: #e2e8f0;
+      color: var(--text-main);
+    }
+
+    @media (max-width: 900px) {
+      .header-container { flex-direction: column; align-items: stretch; }
+      .nav-tabs { width: 100%; justify-content: center; }
+      .db-layout { grid-template-columns: 1fr; height: auto; }
+      .db-category-panel { height: auto; }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-container">
+      <a href="index.html" class="logo">🍲 모크드 레시피 포털</a>
+      <nav class="nav-tabs">
+        <a href="index.html" class="tab-btn">🏠 홈</a>
+        <a href="recipes.html" class="tab-btn">📖 레시피</a>
+        <a href="database.html" class="tab-btn active">🗄️ 음식 DB</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container">
+    <div class="db-layout">
+      <!-- 카테고리 패널 (음식 추가 영역이 상단으로 이동) -->
+      <div class="db-category-panel">
+        <div class="db-header">
+          <h3>카테고리 선택</h3>
+        </div>
+
+        <!-- 음식 추가 바 (요청사항: 카테고리보다 위에 오도록 배치) -->
+        <div class="db-add-bar">
+          <input type="text" id="dbNewFoodInput" class="search-input" placeholder="새 음식 이름 입력 후 Enter" onkeydown="if(event.key==='Enter'){event.preventDefault(); addFoodToDb();}">
+          <button class="btn btn-primary" onclick="addFoodToDb()">추가</button>
+        </div>
+
+        <div class="category-filter">
+          <input type="text" id="dbCatSearch" placeholder="카테고리 검색...">
+        </div>
+        <ul class="category-list" id="dbCategoryList"></ul>
+        <div id="categoryLoadMoreContainer"></div>
+      </div>
+
+      <!-- 콘텐츠 패널 -->
+      <div class="db-content-panel">
+        <div class="db-header">
+          <div>
+            <h3 id="dbCurrentCatTitle" style="display:inline-block; margin-right:0.5rem;">음식 목록</h3>
+            <span id="dbCurrentCatCount" style="font-size:0.85rem; color:var(--text-muted);">0개 등록됨</span>
+          </div>
+          <span style="font-size:0.8rem; color:var(--text-muted); background:#f1f5f9; padding:3px 8px; border-radius:4px;">
+            규격: 40행 × 2열 (페이지당 최대 80개)
+          </span>
+        </div>
+
+        <div class="db-table-wrapper">
+          <div class="db-grid-container" id="dbFoodBadges"></div>
+        </div>
+
+        <div class="pagination-bar" id="dbPaginationBar"></div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    const defaultCategories = ["밥류", "죽류", "반찬", "미음", "범벅", "응이", "국수", "수제비류", "만두류", "떡국류", "국", "탕", "찌개", "전골", "김치", "나물", "구이류", "조림류", "볶음", "초류", "전류", "찜류", "선류", "회류", "마른찬류", "순대", "편육", "족편", "수란류", "묵류", "두부류", "장아찌류", "젓갈류", "식해류", "쌈류", "떡류", "과정류", "푸드트럭요리", "시장음식", "길거리음식", "도시락", "채식·비건", "퓨전요리", "브런치", "버거", "샌드위치", "샐러드", "포케", "타코", "부리토", "피자", "파스타", "치킨", "덮밥", "라이스볼", "누들", "커리", "케밥", "핫도그", "프라이드치킨", "젓갈", "김치", "정찬", "사찰음식", "궁중음식", "전통찻집", "술", "해장음식", "면요리", "메밀요리", "분식", "전통간식", "전통떡", "빵", "롤빵", "디저트", "브라우니", "대형 케이크", "소형 케이크", "사탕", "과자", "쿠키", "비스킷", "크래커", "프로스팅", "필링", "파이", "타르트", "페이스트리", "크럼블", "코블러", "아이스크림", "냉동 디저트", "무스", "트라이플", "커스터드", "팬케이크", "와플", "크레페", "칠리", "딥", "스프레드", "살사", "계란 요리", "튀김", "그릴", "바비큐", "구운 파스타", "반죽", "소스", "속을 채운 파스타", "피자", "칼조네", "패스트푸드", "야매요리", "수프", "스튜", "원팟요리", "볶음 요리", "퀘사디아", "토스트", "크로스티니", "랩", "무알음료", "알콜음료", "칵테일", "처트니", "피클", "렐리시", "발효음식", "잼", "젤리", "보존음식", "드레싱", "마리네이드", "스시", "디저트용 소스", "생선용 소스", "육류용 소스", "가금류용 소스", "육수", "스터핑", "생선요리", "해산물요리", "과일요리", "곡물요리", "콩요리", "파스타요리", "허브요리", "향신료요리", "육류요리", "가금류요리", "수렵육요리", "채소요리", "비건요리", "애프터눈 티요리", "전채요리", "아침식사요리", "브런치요리", "카나페요리", "오르되브르요리", "디저트요리", "일반 코스요리", "점심요리", "주요리", "메인 코스요리", "곁들임 요리", "타파스요리", "메제요리", "스낵요리", "저녁식사", "명절/홀리데이", "한국식 중식", "산둥요리", "쓰촨요리", "광둥요리", "장쑤요리", "저장요리", "푸젠요리", "후난요리", "안후이요리", "베이징요리", "상하이요리", "톈진요리", "충칭요리", "허베이요리", "산시(산서)요리", "네이멍구요리", "랴오닝요리", "지린요리", "헤이룽장요리", "허난요리", "후베이요리", "장시요리", "구이저우요리", "광시요리", "하이난요리", "윈난요리", "산시(섬서)요리", "간쑤요리", "칭하이요리", "닝샤요리", "신장요리", "티베트요리", "홍콩요리", "마카오요리", "중국술", "중식포차요리", "중식코스요리", "중식밥집", "중식도시락", "중식분식", "중식야시장", "중식 퓨전요리", "함경도", "평안도", "황해도", "서울", "경기도", "강원도", "충청도", "전라도", "경상도", "일본", "몽골", "대만", "홍콩", "마카오", "대한민국", "북한", "베트남", "태국", "캄보디아", "라오스", "미얀마", "말레이시아", "싱가포르", "인도네시아", "브루나이", "필리핀", "동티모르", "인도", "파키스탄", "방글라데시", "네팔", "부탄", "스리랑카", "몰디브", "아프가니스탄", "사우디아라비아", "아랍에미리트", "카타르", "쿠웨이트", "바레인", "오만", "예멘", "이라크", "이란", "시리아", "레바논", "요르단", "이스라엘", "팔레스타인", "터키", "키프로스", "아르메니아", "아제르바이잔", "조지아", "카자흐스탄", "우즈베키스탄", "투르크메니스탄", "키르기스스탄", "타지키스탄", "러시아", "우크라이나", "벨라루스", "몰도바", "루마니아", "불가리아", "세르비아", "몬테네그로", "북마케도니아", "보스니아 헤르체고비나", "코소보", "영국", "아일랜드", "프랑스", "벨기에", "네덜란드", "룩셈부르크", "독일", "오스트리아", "스위스", "리히텐슈타인", "모나코", "스페인", "포르투갈", "이탈리아", "그리스", "알바니아", "크로아티아", "슬로베니아", "몰타", "안도라", "산마리노", "바티칸", "노르웨이", "스웨덴", "덴마크", "핀란드", "아이슬란드", "폴란드", "체코", "슬로바키아", "헝가리", "에스토니아", "라트비아", "리투아니아", "가나", "가봉", "감비아", "기니", "기니비사우", "나미비아", "나이지리아", "남수단", "남아프리카공화국", "니제르", "라이베리아", "레소토", "르완다", "리비아", "마다가스카르", "말라위", "말리", "모로코", "모리셔스", "모리타니", "모잠비크", "베냉", "보츠와나", "부룬디", "부르키나파소", "상투메 프린시페", "서사하라", "세네갈", "세이셸", "소말리아", "수단", "시에라리온", "알제리", "앙골라", "에리트레아", "에스와티니", "에티오피아", "우간다", "이집트", "잠비아", "적도 기니", "중앙아프리카공화국", "지부티", "짐바브웨", "차드", "카메룬", "카보베르데", "케냐", "코모로", "코트디부아르", "콩고 공화국", "콩고 민주 공화국", "탄자니아", "토고", "튀니지", "캐나다", "미국", "멕시코", "그린란드", "버뮤다", "생피에르 미클롱", "과테말라", "벨리즈", "엘살바도르", "온두라스", "니카라과", "코스타리카", "파나마", "쿠바", "자메이카", "아이티", "도미니카공화국", "바하마", "바베이도스", "트리니다드 토바고", "그레나다", "세인트루시아", "세인트빈센트 그레나딘", "도미니카", "앤티가 바부다", "세인트키츠 네비스", "아루바", "퀴라소", "케이맨 제도", "버진아일랜드", "푸에르토리코", "과들루프", "마르티니크", "브라질", "아르헨티나", "칠레", "페루", "볼리비아", "파라과이", "우루과이", "콜롬비아", "베네수엘라", "에콰도르", "가이아나", "수리남", "프랑스령 기아나", "포클랜드 제도", "호주", "뉴질랜드", "파푸아뉴기니", "피지", "사모아", "통가", "바누아투", "솔로몬 제도", "미크로네시아 연방", "마셜 제도", "팔라우", "키리바시", "나우루", "투발루", "쿡 제도", "니우에", "뉴칼레도니아", "프랑스령 폴리네시아", "괌", "북마리아나 제도", "미국령 사모아", "크리스마스섬", "코코스 제도", "노퍽섬", "아프리카 부족요리", "아시아 부족요리", "유럽 부족요리", "북미 부족요리", "중남미 부족요리", "카리브해 부족요리", "남미 부족요리", "오세아니아 부족요리"];
+
+    const DB_STORAGE_KEY = "mocked_food_database";
+    const categories = Array.from(new Set(defaultCategories));
+
+    const ITEMS_PER_PAGE = 80;
+    let dbCurrentPage = 1;
+    let foodDatabase = {};
+    let selectedDbCategory = categories[0];
+    
+    // 카테고리 더보기 관련 변수 (10개 단위)
+    let visibleCategoryCount = 10;
+    const CATEGORIES_PER_PAGE = 10;
+
+    function loadData() {
+      const storedDb = localStorage.getItem(DB_STORAGE_KEY);
+      foodDatabase = storedDb ? JSON.parse(storedDb) : {};
+    }
+
+    function saveFoodDb() {
+      localStorage.setItem(DB_STORAGE_KEY, JSON.stringify(foodDatabase));
+    }
+
+    function renderDbCategories(filterText = "") {
+      const listEl = document.getElementById("dbCategoryList");
+      const loadMoreContainer = document.getElementById("categoryLoadMoreContainer");
+      listEl.innerHTML = "";
+      loadMoreContainer.innerHTML = "";
+
+      const filtered = categories.filter(c => c.toLowerCase().includes(filterText.toLowerCase()));
+      
+      // 검색어가 있을 때는 전체 검색 결과를 보여주고, 없을 때는 페이징(10개 단위) 적용
+      const limit = filterText ? filtered.length : visibleCategoryCount;
+      const slicedCategories = filtered.slice(0, limit);
+
+      slicedCategories.forEach(cat => {
+        const count = (foodDatabase[cat] || []).length;
+        const li = document.createElement("li");
+        li.innerHTML = `
+          <button class="category-btn ${selectedDbCategory === cat ? 'active' : ''}" onclick="selectDbCat('${cat}')">
+            <span>${cat}</span>
+            <span class="badge">${count}</span>
+          </button>
+        `;
+        listEl.appendChild(li);
+      });
+
+      // 검색 중이 아니고, 전체 카테고리 수보다 보여지는 수가 적을 때 "더보기" 버튼 표시
+      if (!filterText && visibleCategoryCount < filtered.length) {
+        loadMoreContainer.innerHTML = `
+          <button class="load-more-cat-btn" onclick="loadMoreCategories()">카테고리 더보기 (+10)</button>
+        `;
+      }
+    }
+
+    function loadMoreCategories() {
+      visibleCategoryCount += CATEGORIES_PER_PAGE;
+      renderDbCategories(document.getElementById("dbCatSearch").value.trim());
+    }
+
+    function selectDbCat(cat) {
+      selectedDbCategory = cat;
+      dbCurrentPage = 1;
+      renderDbCategories(document.getElementById("dbCatSearch").value.trim());
+      renderDbFoods();
+    }
+
+    function renderDbFoods() {
+      document.getElementById("dbCurrentCatTitle").textContent = selectedDbCategory;
+      const list = foodDatabase[selectedDbCategory] || [];
+      document.getElementById("dbCurrentCatCount").textContent = `총 ${list.length}개 등록됨`;
+
+      const grid = document.getElementById("dbFoodBadges");
+      const paginationBar = document.getElementById("dbPaginationBar");
+
+      if (list.length === 0) {
+        grid.innerHTML = `
+          <div style="grid-column: 1/-1; text-align: center; padding: 3rem 1rem; color: var(--text-muted);">
+            <p style="font-size: 0.95rem; font-weight: 500;">등록된 음식 항목이 없습니다.</p>
+            <p style="font-size: 0.8rem; margin-top: 4px;">상단 입력창에서 새 음식 이름을 등록해 보세요.</p>
+          </div>
+        `;
+        paginationBar.innerHTML = "";
+        return;
+      }
+
+      const totalPages = Math.ceil(list.length / ITEMS_PER_PAGE) || 1;
+      if (dbCurrentPage > totalPages) dbCurrentPage = totalPages;
+
+      const startIndex = (dbCurrentPage - 1) * ITEMS_PER_PAGE;
+      const endIndex = Math.min(startIndex + ITEMS_PER_PAGE, list.length);
+      const pageItems = list.slice(startIndex, endIndex);
+
+      const colHeight = 40;
+      const leftColItems = pageItems.slice(0, colHeight);
+      const rightColItems = pageItems.slice(colHeight, colHeight * 2);
+
+      let gridHtml = `
+        <div style="display:flex; flex-direction:column;">
+          ${leftColItems.map((food, idx) => {
+            const actualIndex = startIndex + idx;
+            return `
+              <div class="db-row-item">
+                <div class="db-row-left">
+                  <span class="db-index-badge">${actualIndex + 1}</span>
+                  <span class="db-food-name" title="${food}">${food}</span>
+                </div>
+                <button type="button" class="del-btn" title="삭제" onclick="removeFoodFromDb(${actualIndex})">&times;</button>
+              </div>
+            `;
+          }).join("")}
+        </div>
+        <div style="display:flex; flex-direction:column;">
+          ${rightColItems.map((food, idx) => {
+            const actualIndex = startIndex + colHeight + idx;
+            return `
+              <div class="db-row-item">
+                <div class="db-row-left">
+                  <span class="db-index-badge">${actualIndex + 1}</span>
+                  <span class="db-food-name" title="${food}">${food}</span>
+                </div>
+                <button type="button" class="del-btn" title="삭제" onclick="removeFoodFromDb(${actualIndex})">&times;</button>
+              </div>
+            `;
+          }).join("")}
+        </div>
+      `;
+
+      grid.innerHTML = gridHtml;
+      renderDbPagination(totalPages, list.length, startIndex, endIndex);
+    }
+
+    function renderDbPagination(totalPages, totalCount, start, end) {
+      const paginationBar = document.getElementById("dbPaginationBar");
+
+      let buttonsHtml = `
+        <button class="page-num-btn" onclick="changeDbPage(1)" ${dbCurrentPage === 1 ? "disabled" : ""} title="처음 페이지">«</button>
+        <button class="page-num-btn" onclick="changeDbPage(${dbCurrentPage - 1})" ${dbCurrentPage === 1 ? "disabled" : ""} title="이전">‹</button>
+      `;
+
+      const maxButtons = 5;
+      let startPage = Math.max(1, dbCurrentPage - Math.floor(maxButtons / 2));
+      let endPage = Math.min(totalPages, startPage + maxButtons - 1);
+      if (endPage - startPage + 1 < maxButtons) {
+        startPage = Math.max(1, endPage - maxButtons + 1);
+      }
+
+      for (let p = startPage; p <= endPage; p++) {
+        buttonsHtml += `
+          <button class="page-num-btn ${p === dbCurrentPage ? 'active' : ''}" onclick="changeDbPage(${p})">${p}</button>
+        `;
+      }
+
+      buttonsHtml += `
+        <button class="page-num-btn" onclick="changeDbPage(${dbCurrentPage + 1})" ${dbCurrentPage === totalPages ? "disabled" : ""} title="다음">›</button>
+        <button class="page-num-btn" onclick="changeDbPage(${totalPages})" ${dbCurrentPage === totalPages ? "disabled" : ""} title="마지막 페이지">»</button>
+      `;
+
+      paginationBar.innerHTML = `
+        <div style="font-size:0.8rem; color:var(--text-muted);">
+          표시 중: <strong>${totalCount === 0 ? 0 : start + 1} - ${end}</strong> / 전체 ${totalCount}개
+        </div>
+        <div class="pagination-nav">
+          ${buttonsHtml}
+        </div>
+      `;
+    }
+
+    function changeDbPage(page) {
+      dbCurrentPage = page;
+      renderDbFoods();
+    }
+
+    function addFoodToDb() {
+      const input = document.getElementById("dbNewFoodInput");
+      const name = input.value.trim();
+      if (!name) return;
+
+      if (!foodDatabase[selectedDbCategory]) {
+        foodDatabase[selectedDbCategory] = [];
+      }
+
+      if (foodDatabase[selectedDbCategory].includes(name)) {
+        alert("이미 등록된 음식 이름입니다.");
+        return;
+      }
+
+      foodDatabase[selectedDbCategory].push(name);
+      saveFoodDb();
+      input.value = "";
+
+      const totalPages = Math.ceil(foodDatabase[selectedDbCategory].length / ITEMS_PER_PAGE);
+      dbCurrentPage = totalPages;
+
+      renderDbFoods();
+      renderDbCategories(document.getElementById("dbCatSearch").value.trim());
+    }
+
+    function removeFoodFromDb(index) {
+      if (foodDatabase[selectedDbCategory]) {
+        foodDatabase[selectedDbCategory].splice(index, 1);
+        saveFoodDb();
+
+        const totalPages = Math.ceil(foodDatabase[selectedDbCategory].length / ITEMS_PER_PAGE) || 1;
+        if (dbCurrentPage > totalPages) dbCurrentPage = totalPages;
+
+        renderDbFoods();
+        renderDbCategories(document.getElementById("dbCatSearch").value.trim());
+      }
+    }
+
+    function handleQueryParams() {
+      const params = new URLSearchParams(window.location.search);
+      const catParam = params.get("cat");
+      if (catParam && categories.includes(catParam)) {
+        selectedDbCategory = catParam;
+        
+        // 만약 선택된 카테고리가 기본 10개 범위를 넘어가면 그 이상을 미리 로드
+        const index = categories.indexOf(catParam);
+        if (index >= visibleCategoryCount) {
+          visibleCategoryCount = Math.ceil((index + 1) / CATEGORIES_PER_PAGE) * CATEGORIES_PER_PAGE;
+        }
+      }
+    }
+
+    document.getElementById("dbCatSearch").addEventListener("input", (e) => {
+      renderDbCategories(e.target.value.trim());
+    });
+
+    loadData();
+    handleQueryParams();
+    renderDbCategories();
+    renderDbFoods();
+  </script>
+</body>
+</html>
