@@ -355,7 +355,7 @@
       border-color: #fecaca;
     }
 
-    /* Modal */
+    /* Modal - 스크롤 풀림 현상 원천 방지 레이아웃 */
     .modal-overlay {
       position: fixed;
       inset: 0;
@@ -376,7 +376,8 @@
       border-radius: var(--radius);
       width: 100%;
       max-width: 580px;
-      max-height: 90vh;
+      height: 85vh; /* 고정 높이 지정으로 브라우저 재진입 시 렌더링 오류 방지 */
+      max-height: 85vh;
       display: flex;
       flex-direction: column;
       box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
@@ -389,11 +390,21 @@
       justify-content: space-between;
       align-items: center;
       border-bottom: 1px solid var(--border-color);
+      flex-shrink: 0;
+    }
+
+    #recipeForm {
+      display: flex;
+      flex-direction: column;
+      flex: 1 1 auto;
+      overflow: hidden;
     }
 
     .modal-body {
       padding: 1.25rem;
-      overflow-y: auto;
+      flex: 1 1 auto;
+      overflow-y: auto; /* 내용 영역만 스크롤 고정 */
+      -webkit-overflow-scrolling: touch;
     }
 
     .form-group {
@@ -431,6 +442,7 @@
       gap: 0.5rem;
       border-top: 1px solid var(--border-color);
       background: #fafafa;
+      flex-shrink: 0;
     }
 
     @media (max-width: 900px) {
@@ -592,7 +604,6 @@
       const filtered = categories.filter(c => c.toLowerCase().includes(filterText.toLowerCase()));
       document.getElementById("recipeCatCount").textContent = `(${categories.length})`;
 
-      // 검색어가 있는 경우 전체 목록 표시, 없는 경우 페이지네이션(10개 단위) 적용
       const displayList = filterText ? filtered : filtered.slice(0, categoryDisplayLimit);
 
       displayList.forEach(cat => {
@@ -607,7 +618,6 @@
         listEl.appendChild(li);
       });
 
-      // 검색어가 없고 아직 보여줄 카테고리가 남았다면 '더보기' 버튼 추가
       if (!filterText && categoryDisplayLimit < filtered.length) {
         const remainingCount = filtered.length - categoryDisplayLimit;
         moreContainer.innerHTML = `
@@ -664,7 +674,6 @@
         const card = document.createElement("div");
         card.className = "recipe-card";
         
-        // 기존 레시피 데이터 호환 처리 (desc 필드가 있는 경우 process로 간주)
         const ingredientsText = item.ingredients ? `<div class="recipe-section-box"><strong>[재료]</strong><br>${item.ingredients}</div>` : '';
         const preparationText = item.preparation ? `<div class="recipe-section-box"><strong>[준비]</strong><br>${item.preparation}</div>` : '';
         const processText = item.process || item.desc ? `<div class="recipe-section-box"><strong>[과정]</strong><br>${item.process || item.desc}</div>` : '';
